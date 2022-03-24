@@ -60,6 +60,12 @@
     encode($alphabet, $keyword, trim($message));
   }
 
+  // Si la opcion ingresada es 2, se ejecuta el descifrado Vigenere
+  if (strcmp($option, $decode_option) == 0) {
+    // La funcion trim() elimina los espacios en blanco del principio y el final de un string
+    decode($alphabet, $keyword, trim($message));
+  }
+
   /**
   * Realiza el cifrado Vigenere del mensaje de entrada
   *
@@ -114,6 +120,66 @@
     }
 
     echo $encrypted_message;
+  }
+
+  /**
+  * Realiza el descifrado Vigenere del mensaje de entrada
+  *
+  * @param array $alphabet
+  * @param integer $keyword palabra clave
+  * @param string $message mensaje de entrada
+  */
+  function decode($alphabet, $keyword, $message) {
+    $array_message = getCharsArray($message);
+    $array_keyword = getCharsArray($keyword);
+
+    $alphabet_size = count($alphabet);
+    $array_keyword_size = count($array_keyword);
+    $index_char_message;
+    $keyword_char_index;
+    $keyword_char;
+    $decrypted_message;
+
+    // Variable utilizada para recorrer el arreglo de la palabra clave
+    $keyword_position = 0;
+
+    foreach ($array_message as $key => $current_char) {
+
+      /* Si el caracter actualmente recorrido del mensaje no es un espacio,
+      calcula el caracter de descifrado */
+      if ($current_char !== " ") {
+        // Obtiene el indice, en el alfabeto, de un caracter cifrado del mensaje de entrada
+        $index_char_message = getIndex($alphabet, $current_char);
+
+        $keyword_char = $array_keyword[$keyword_position];
+        $keyword_char_index = getIndex($alphabet, $keyword_char);
+
+        /* Luego de obtener el valor de la posicion en el alfabeto de un caracter de la palabra clave,
+        se incrementa en uno el valor de keyword_position para que en el siguiente ciclo se utilice el
+        siguiente caracter de la palabra clave para descifrar el mensaje de entrada */
+        $keyword_position = ($keyword_position + 1) % $array_keyword_size;
+
+        /* Calcula el valor de la posicion del caracter de descifrado
+        correspondiente al caracter actualmente recorrido */
+        if ($index_char_message - $keyword_char_index < 0) {
+          $index_char_message = $alphabet_size + ($index_char_message - $keyword_char_index);
+        } else {
+          $index_char_message = ($index_char_message - $keyword_char_index) % $alphabet_size;
+        }
+
+        // Agrega el caracter descifrado al resultado
+        $decrypted_message .= $alphabet[$index_char_message];
+      }
+
+      /* Si el caracter actualmente recorrido es un espacio, agrega un espacio
+      al resultado */
+      if ($current_char == " ") {
+        $decrypted_message .= " ";
+      }
+
+    }
+
+    echo $decrypted_message;
   }
 
   /**
